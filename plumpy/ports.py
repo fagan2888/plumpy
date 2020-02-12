@@ -377,9 +377,7 @@ class PortNamespace(collections.MutableMapping, Port):
 
         :param valid_type: a tuple or single valid type that the namespace accepts
         """
-        if valid_type is None:
-            self.dynamic = False
-        else:
+        if valid_type is not None:
             self.dynamic = True
 
         super(PortNamespace, self.__class__).valid_type.fset(self, valid_type)
@@ -510,10 +508,7 @@ class PortNamespace(collections.MutableMapping, Port):
         # Overload mutable attributes of PortNamespace unless overridden by value in namespace_options
         for attr in dir(port_namespace):
             if is_mutable_property(PortNamespace, attr):
-                if attr in namespace_options:
-                    setattr(self, attr, namespace_options.pop(attr))
-                else:
-                    setattr(self, attr, getattr(port_namespace, attr))
+                setattr(self, attr, namespace_options.pop(attr, getattr(port_namespace, attr)))
 
         if namespace_options:
             raise ValueError('the namespace_options {}, is not a supported PortNamespace property'.format(', '.join(
